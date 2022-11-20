@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "pb/stream-server"; // 指定生成的Go代码在项目中的导入路径
+
+// 定义服务
+service Greeter {
+    // SayHello
+    rpc SayHello (HelloRequest) returns (stream HelloResponse) {}
+}
+
+message HelloRequest {
+    string requst = 1;
+}
+
+message HelloResponse {
+    string reply = 1;
+}
+
+// 在项目下执行
+
+/**
+protoc -I=proto --go_out=pb --go_opt=paths=source_relative \
+--go-grpc_out=pb --go-grpc_opt=paths=source_relative \
+stream-server/hello.proto
+
+解释：
+-I=proto 是告诉protoc，要编译的文件路径的一部分。
+--go_out=pb 表示输出目录在pb, --go_opt=paths=source_relative 表示输出路径和输入路径一样。
+也就是说：输入：proto/输入路径，输出：pb/输入路径。这里的输入路径就是 stream-server/hello.proto
+--go-grpc 和 --go-grpc_opt 与 --go_out 和 --go-opt 一样。
+*/
