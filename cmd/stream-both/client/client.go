@@ -8,7 +8,6 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/metadata"
 
 	pb "github.com/geraldkohn/grpc-example/pb/stream-both"
 )
@@ -30,7 +29,7 @@ func main() {
 	defer cancel()
 
 	// 发送元数据
-	ctx = metadata.AppendToOutgoingContext(ctx, "user-id", "1000000")
+	// ctx = metadata.AppendToOutgoingContext(ctx, "user-id", "1000000")
 
 	// 双向流式 RPC
 	stream, _ := c.SayHello(ctx)
@@ -84,6 +83,8 @@ func main() {
 }
 
 func debug(format string, a ...interface{}) {
-	s := fmt.Sprintf(format, a...)
-	fmt.Println(s)
+	if _debug {
+		s := fmt.Sprintf(format, a...)
+		fmt.Println(s)
+	}
 }
