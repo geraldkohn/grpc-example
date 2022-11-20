@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"time"
 
 	pb "github.com/geraldkohn/grpc-example/pb/stream-both"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 type server struct {
@@ -15,6 +15,13 @@ type server struct {
 }
 
 func (s *server) SayHello(stream pb.Greeter_SayHelloServer) error {
+	md, ok := metadata.FromIncomingContext(stream.Context())
+	if ok {
+		strs := md.Get("user-id")
+		if len(strs) > 0 {
+			fmt.Printf("服务器收到元数据: user-id %s\n", strs[0])
+		}
+	}
 	for {
 		// 接收流式请求
 		in, err := stream.Recv()
@@ -26,6 +33,7 @@ func (s *server) SayHello(stream pb.Greeter_SayHelloServer) error {
 			return err
 		}
 
+		fmt.Printf("收到请求: %s\n", in.GetRequst())
 		reply := handle(in.GetRequst())
 
 		// 返回流式响应
@@ -36,8 +44,8 @@ func (s *server) SayHello(stream pb.Greeter_SayHelloServer) error {
 }
 
 func handle(s string) string {
-	time.Sleep(100 * time.Second) // 模拟处理请求时间
-	s += " Server Response"
+	// time.Sleep(100 * time.Second) // 模拟处理请求时间
+	s = "服务器返回响应: " + s
 	return s
 }
 

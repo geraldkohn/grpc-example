@@ -8,9 +8,12 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 
 	pb "github.com/geraldkohn/grpc-example/pb/stream-both"
 )
+
+var _debug = true
 
 func main() {
 	conn, err := grpc.Dial("127.0.0.1:8972", grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -26,6 +29,9 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	// 发送元数据
+	ctx = metadata.AppendToOutgoingContext(ctx, "user-id", "1000000")
+
 	// 双向流式 RPC
 	stream, _ := c.SayHello(ctx)
 
@@ -39,7 +45,9 @@ func main() {
 			case <-sendClose:
 				return
 			default:
-				err := stream.Send(&pb.HelloRequest{Requst: fmt.Sprintf("Client send at %s", time.Now().String())})
+				debug("客户端发送一条消息")
+				req := fmt.Sprintf("Client send at %s", time.Now().String())
+				err := stream.Send(&pb.HelloRequest{Requst: req})
 				if err != nil {
 					return
 				}
@@ -66,7 +74,16 @@ func main() {
 	}()
 
 	time.Sleep(1 * time.Second)
+	debug("客户端停止发送消息")
 	sendClose <- struct{}{} // 停止发送消息
-	stream.CloseSend()      // 客户端关闭连接
-	<-wait                  // 等待客户端接收到全部信息
+	debug("客户端关闭连接")
+	stream.CloseSend() // 客户端关闭连接
+	debug("等待客户端收到服务器全部消息")
+	<-wait // 等待客户端接收到全部信息
+	debug("收到服务器全部消息，结束")
+}
+
+func debug(format string, a ...interface{}) {
+	s := fmt.Sprintf(format, a...)
+	fmt.Println(s)
 }
