@@ -12,6 +12,9 @@ service Greeter {
 
 message HelloRequest {
     string requst = 1;
+    int64 id = 2;
+    string version = 3;
+    string others = 4;
 }
 
 message HelloResponse {

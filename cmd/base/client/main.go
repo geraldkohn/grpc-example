@@ -27,6 +27,6 @@ func main() {
 	defer cancel()
 	// 添加元数据
 	ctx = metadata.AppendToOutgoingContext(ctx, "user-id", "10000000")
-	r, _ := c.SayHello(ctx, &pb.HelloRequest{Requst: "client"})
+	r, _ := c.SayHello(ctx, &pb.HelloRequest{Requst: "client", Id: 111, Version: "v1", Others: "nil"})
 	fmt.Println(r.GetReply())
 }

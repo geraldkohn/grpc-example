@@ -5,6 +5,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"net"
 
 	pb "github.com/geraldkohn/grpc-example/pb/base"
@@ -28,6 +29,10 @@ type server struct {
 }
 
 func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloResponse, error) {
+	log.Printf("Request: %v", in)
+	log.Printf("Request: %+v", in)
+	log.Printf("Request: %#v", in)
+
 	// 获取元数据
 	// 将鉴权转移到了拦截器中
 	// md, ok := metadata.FromIncomingContext(ctx)
